@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output = "../genarated/prisma"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -8,10 +8,41 @@ datasource db {
 }
 
 model User {
-  id           BigInt    @id @default(autoincrement())
-  email        String    @unique
-  passwordHash String    @map("password_hash")
-  createdAt    DateTime  @default(now()) @map("created_at")
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  avatar       String?
+  
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  reactions    ReactionHistory[]
 
   @@map("users")
+}
+
+model ReactionHistory {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+
+  reagents     String
+  products     String
+  equation     String
+  isBalanced   Boolean  @default(false) @map("is_balanced")
+  temperature  Float?
+  pressure     Float?
+  reactionType String?  @map("reaction_type")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@map("reaction_history")
+}
+
+model Substance {
+  id      String @id @default(uuid())
+  name    String
+  formula String
+
+  @@map("substances")
 }
