@@ -1,23 +1,25 @@
-import express from 'express';
-import dotenv from 'dotenv';
+import express from "express";
+import dotenv from "dotenv";
+import { auth } from "./lib/auth.js";
+import { toNodeHandler } from "better-auth/node";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware para ler JSON
 app.use(express.json());
 
-// Rota de teste
-app.get('/', (req, res) => {
-  res.json({
-    message: '🚀 MinURL API rodando!',
-    status: 'OK'
-  });
+const handler = toNodeHandler(auth);
+
+app.use("/api/auth", async (req, res) => {
+  return handler(req, res);
 });
 
-// Iniciar servidor
+app.get("/health", (req, res) => {
+  res.json({ status: "OK" });
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor em http://localhost:${PORT}`);
 });
